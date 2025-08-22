@@ -147,6 +147,7 @@ token.json
 test-results/
 coverage/
 .nyc_output/
+test-env.js
 
 # Build artifacts
 dist/
