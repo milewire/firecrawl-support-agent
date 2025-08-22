@@ -7,7 +7,13 @@
   "scripts": {
     "deploy": "node deploy-commands.mjs",
     "start": "node discord_bot.mjs",
-    "dev": "nodemon discord_bot.mjs"
+    "dev": "nodemon discord_bot.mjs",
+    "seed:labels": "node scripts/seed-labels.mjs",
+    "protect:main:ps": "powershell -ExecutionPolicy Bypass -File scripts/protect-main.ps1",
+    "protect:main:sh": "bash scripts/protect-main.sh",
+    "release:patch": "npm version patch -m \"chore(release): %s\" && git push --follow-tags",
+    "release:minor": "npm version minor -m \"chore(release): %s\" && git push --follow-tags",
+    "release:major": "npm version major -m \"chore(release): %s\" && git push --follow-tags"
   },
   "keywords": [
     "discord",
