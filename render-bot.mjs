@@ -282,6 +282,17 @@ const PORT = process.env.PORT || 3000;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'Firecrawl Support Agent API',
+    status: 'running',
+    timestamp: new Date().toISOString(),
+    bot: client.user?.tag || 'Starting...',
+    uptime: process.uptime()
+  });
+});
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ 
@@ -325,16 +336,21 @@ app.post('/process-email', async (req, res) => {
 // Start both Discord bot and web server
 async function startServices() {
   try {
-    // Start Discord bot
-    await client.login(process.env.DISCORD_BOT_TOKEN);
-    
-    // Start web server
+    // Start web server FIRST (so Render can see it's working)
     app.listen(PORT, () => {
-      console.log(`🚀 Combined Discord bot + Web server running on port ${PORT}`);
+      console.log(`🚀 Web server running on port ${PORT}`);
       console.log(`📧 Email webhook: http://localhost:${PORT}/email-webhook`);
       console.log(`🔧 Health check: http://localhost:${PORT}/health`);
-      console.log(`🤖 Discord bot: ${client.user?.tag || 'Starting...'}`);
     });
+    
+    // Then try to start Discord bot (but don't fail if it doesn't work)
+    try {
+      await client.login(process.env.DISCORD_BOT_TOKEN);
+      console.log(`🤖 Discord bot: ${client.user?.tag || 'Starting...'}`);
+    } catch (discordError) {
+      console.error('Discord bot failed to start:', discordError.message);
+      console.log('⚠️ Web server is still running for email/webhook functionality');
+    }
   } catch (error) {
     console.error('Failed to start services:', error);
     process.exit(1);
