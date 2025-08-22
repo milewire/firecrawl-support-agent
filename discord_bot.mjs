@@ -303,6 +303,8 @@ setupEmailWebhook(app);
 // Manual email processing endpoint (for testing)
 app.post('/process-email', async (req, res) => {
   try {
+    console.log('📧 Processing email request:', JSON.stringify(req.body, null, 2));
+    
     const { from, subject, text, html } = req.body;
     
     if (!from || !subject || (!text && !html)) {
@@ -310,7 +312,10 @@ app.post('/process-email', async (req, res) => {
     }
 
     const emailData = { from, subject, text, html };
+    console.log('📧 Email data prepared:', JSON.stringify(emailData, null, 2));
+    
     const result = await processEmail(emailData);
+    console.log('📧 Email processed:', JSON.stringify(result, null, 2));
     
     // Create GitHub issue
     const issueUrl = await createIssue({ 
@@ -318,10 +323,12 @@ app.post('/process-email', async (req, res) => {
       body: result.issueData.body, 
       labels: result.issueData.labels 
     });
+    console.log('📧 GitHub issue created:', issueUrl);
     
     // Send auto-reply email
     const autoReply = generateAutoReply(result.triageResult);
     const emailSent = await sendEmailReply(emailData.from.email || emailData.from, emailData.subject, autoReply);
+    console.log('📧 Auto-reply sent:', emailSent);
     
     res.json({ 
       success: true, 
@@ -331,8 +338,13 @@ app.post('/process-email', async (req, res) => {
       emailReplySent: emailSent
     });
   } catch (error) {
-    console.error('Error processing email:', error);
-    res.status(500).json({ error: 'Failed to process email' });
+    console.error('❌ Error processing email:', error);
+    console.error('❌ Error stack:', error.stack);
+    res.status(500).json({ 
+      error: 'Failed to process email',
+      details: error.message,
+      stack: error.stack
+    });
   }
 });
 
