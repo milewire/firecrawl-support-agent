@@ -1,4 +1,6 @@
 [![CI](https://github.com/milewire/firecrawl-support-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/milewire/firecrawl-support-agent/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/milewire/firecrawl-support-agent?display_name=tag&sort=semver)](https://github.com/milewire/firecrawl-support-agent/releases)
+[![License: ISC](https://img.shields.io/github/license/milewire/firecrawl-support-agent)](LICENSE)
 
 # Firecrawl Support Agent
 
