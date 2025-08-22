@@ -313,7 +313,11 @@ app.post('/process-email', async (req, res) => {
     const result = await processEmail(emailData);
     
     // Create GitHub issue
-    const issue = await createIssue(result.issueData.title, result.issueData.body, result.issueData.labels);
+    const issueUrl = await createIssue({ 
+      title: result.issueData.title, 
+      body: result.issueData.body, 
+      labels: result.issueData.labels 
+    });
     
     // Send auto-reply email
     const autoReply = generateAutoReply(result.triageResult);
@@ -322,7 +326,7 @@ app.post('/process-email', async (req, res) => {
     res.json({ 
       success: true, 
       ticketId: result.ticketData.id,
-      issueNumber: issue.number,
+      issueUrl: issueUrl,
       triage: result.triageResult,
       emailReplySent: emailSent
     });
