@@ -34,8 +34,7 @@ cd firecrawl-support-agent
 npm install
 
 # Set up environment variables (see Configuration section below)
-cp .env.example .env.local
-# Edit .env.local with your actual values
+# Create .env.local file with your actual values
 
 # Deploy slash commands
 npm run deploy
@@ -162,27 +161,37 @@ Create a GitHub issue with automatic triage and categorization.
 
 ```
 firecrawl-support-agent/
-├── commands/           # Discord slash commands
-│   ├── help.js        # Help command
-│   ├── ping.js        # Ping command
-│   ├── ticket.js      # Ticket creation command (placeholder)
-│   └── docs.js        # Documentation lookup command (placeholder)
-├── config/            # Configuration files
-│   └── config.json    # Bot configuration
-├── events/            # Discord event handlers
-│   ├── ready.js       # Bot ready event
+├── .github/           # GitHub workflows and templates
+│   ├── workflows/     # CI/CD workflows
+│   └── ISSUE_TEMPLATE/ # Issue templates
+├── commands/          # Discord slash commands
+│   ├── help.js       # Help command
+│   ├── ping.js       # Ping command
+│   ├── ticket.js     # Ticket creation command (placeholder)
+│   └── docs.js       # Documentation lookup command (placeholder)
+├── config/           # Configuration files
+│   └── config.json   # Bot configuration
+├── events/           # Discord event handlers
+│   ├── ready.js      # Bot ready event
 │   └── interactionCreate.js  # Command interaction handler
-├── knowledge/         # Knowledge base
-│   └── faqs.json      # Frequently asked questions
-├── discord_bot.mjs    # Main bot file with all command logic
+├── knowledge/        # Knowledge base
+│   └── faqs.json     # Frequently asked questions
+├── scripts/          # Utility scripts (empty)
+├── .snapshots/       # Project snapshots
+│   ├── sponsors.md   # Sponsorship information
+│   ├── readme.md     # README snapshot
+│   └── config.json   # Configuration snapshot
+├── discord_bot.mjs   # Main bot file with all command logic
 ├── deploy-commands.mjs # Command deployment script
-├── supabase.js        # Supabase client and database functions
-├── github.mjs         # GitHub API integration
-├── docs_ingest.js     # Documentation ingestion script
-├── agent.js           # AI agent logic
-├── test-env.js        # Environment testing utility
-├── firecrawl_api.txt  # API documentation reference
-└── package.json       # Project dependencies
+├── supabase.js       # Supabase client and database functions
+├── github.mjs        # GitHub API integration
+├── docs_ingest.js    # Documentation ingestion script
+├── agent.js          # AI agent logic
+├── test-env.js       # Environment testing utility
+├── firecrawl_api.txt # API documentation reference
+├── LICENSE           # ISC License
+├── .gitignore        # Git ignore patterns
+└── package.json      # Project dependencies
 ```
 
 ## 🔒 Security Features
@@ -287,6 +296,8 @@ Stay updated with the latest features and bug fixes by:
 - ✅ **GitHub Integration**: Automatic issue creation
 - ✅ **Supabase Integration**: Database storage
 - ✅ **Security**: Input sanitization and environment variables
+- ✅ **License**: ISC License included
+- ✅ **GitHub Setup**: Workflows and issue templates
 - 🔄 **Vector Search**: In development
 - 🔄 **Documentation**: In progress
 
