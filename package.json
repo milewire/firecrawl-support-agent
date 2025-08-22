@@ -1,6 +1,6 @@
 {
   "name": "firecrawl-support-agent",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Discord + GitHub + Supabase support bot",
   "type": "module",
   "main": "discord_bot.mjs",
