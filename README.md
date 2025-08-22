@@ -11,10 +11,10 @@ A powerful Discord bot that integrates with GitHub, Supabase, and OpenAI to prov
 - **AI-Powered Support**: Uses OpenAI GPT-4o-mini to provide intelligent responses to user queries
 - **Automatic Ticket Triage**: Automatically categorizes and prioritizes support tickets
 - **GitHub Integration**: Creates and manages GitHub issues for support tickets
-- **Supabase Database**: Stores ticket data and user interactions with vector search capabilities
+- **Microsoft Graph Integration**: Handles email support via Outlook
 - **Discord Slash Commands**: Easy-to-use slash commands for ticket management
-- **Smart Sanitization**: Automatically redacts sensitive information from tickets
-- **Vector Search**: Semantic search through documentation using embeddings
+- **Vector Search**: Semantic search through documentation using Pinecone
+- **Email Webhook**: Processes incoming support emails automatically
 
 ## 📋 Prerequisites
 
@@ -22,7 +22,8 @@ A powerful Discord bot that integrates with GitHub, Supabase, and OpenAI to prov
 - Discord Bot Token
 - OpenAI API Key
 - GitHub Personal Access Token (repo scope)
-- (Optional) Supabase project
+- Microsoft Graph API credentials (for Outlook email)
+- Pinecone API key (for vector search)
 
 ## 🛠️ Installation
 
@@ -74,9 +75,19 @@ npm start
    GITHUB_OWNER=your_github_username_or_org
    GITHUB_REPO=firecrawl-support-agent
 
-   # Supabase (optional)
-   SUPABASE_URL=your_supabase_project_url
-   SUPABASE_KEY=your_supabase_anon_key
+   # Microsoft Graph (Outlook)
+   MICROSOFT_CLIENT_ID=your_microsoft_client_id
+   MICROSOFT_CLIENT_SECRET=your_microsoft_client_secret
+   MICROSOFT_TENANT_ID=your_microsoft_tenant_id
+   MICROSOFT_USER_ID=your_microsoft_user_id
+   MICROSOFT_MULTI_TENANT=true
+   
+   # Firecrawl
+   FIRECRAWL_API_KEY=your_firecrawl_api_key
+   FIRECRAWL_DOCS_URL=your_firecrawl_docs_url
+   
+   # Pinecone (vector search)
+   PINECONE_API_KEY=your_pinecone_api_key
    ```
 
 4. **Deploy slash commands**
@@ -252,12 +263,11 @@ npm start
 | `MICROSOFT_CLIENT_ID` | Microsoft Azure app client ID         | ✅ |
 | `MICROSOFT_CLIENT_SECRET` | Microsoft Azure app client secret   | ✅ |
 | `MICROSOFT_TENANT_ID` | Microsoft Azure tenant ID (single tenant) | ✅ |
-| `MICROSOFT_MULTI_TENANT` | Set to 'true' for multi-tenant mode | ❌ |
+| `MICROSOFT_MULTI_TENANT` | Set to 'true' for multi-tenant mode | ✅ |
 | `MICROSOFT_USER_ID` | Microsoft 365 user ID for sending     | ✅ |
 | `FIRECRAWL_API_KEY` | Firecrawl API key for docs access      | ✅ |
 | `FIRECRAWL_DOCS_URL` | Firecrawl documentation URL           | ✅ |
-| `SUPABASE_URL`      | Supabase project URL                   | ❌ |
-| `SUPABASE_KEY`      | Supabase anon key                      | ❌ |
+| `PINECONE_API_KEY`  | Pinecone API key for vector search     | ✅ |
 
 ## 📝 Contributing
 
@@ -307,13 +317,14 @@ Stay updated with the latest features and bug fixes by:
 - ✅ **Core Features**: Discord bot with slash commands
 - ✅ **AI Integration**: OpenAI GPT-4o-mini integration
 - ✅ **GitHub Integration**: Automatic issue creation and triage
-- ✅ **Supabase Integration**: Database storage
+- ✅ **Microsoft Graph Integration**: Email support via Outlook
+- ✅ **Pinecone Integration**: Vector search capabilities
 - ✅ **Security**: Environment variables and input validation
 - ✅ **License**: ISC License included
 - ✅ **GitHub Setup**: Workflows, issue templates, and release automation
 - ✅ **Release Management**: Automated versioning and release drafting
 - ✅ **Branch Protection**: Scripts for securing main branch
-- 🔄 **Vector Search**: In development
+- ✅ **Vector Search**: Pinecone integration ready
 - 🔄 **Documentation**: In progress
 
 ## 🔐 Protecting `main` (one-time)

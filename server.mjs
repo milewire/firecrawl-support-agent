@@ -1,9 +1,8 @@
 // server.mjs
 import express from 'express';
 import bodyParser from 'body-parser';
-import { setupEmailWebhook } from './email_handler.js';
+import { setupEmailWebhook, processEmail } from './email_handler.js';
 import { createIssue } from './github.mjs';
-import { logTicket } from './supabase.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -35,8 +34,7 @@ app.post('/process-email', async (req, res) => {
     // Create GitHub issue
     const issue = await createIssue(result.issueData.title, result.issueData.body, result.issueData.labels);
     
-    // Log to Supabase
-    await logTicket(result.ticketData.user, result.ticketData.source, result.ticketData.message, result.triageResult.summary, result.triageResult.category, 0.8);
+    // Note: Supabase logging removed - using GitHub issues for tracking
     
     res.json({ 
       success: true, 
