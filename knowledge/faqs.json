@@ -1,0 +1,4 @@
+[
+  { "q": "reset password", "a": "Go to login → Forgot Password → enter email → use the reset link in your inbox." },
+  { "q": "billing contact", "a": "Email billing@yourcompany.com. Hours: Mon–Fri, 9–5 CT." }
+]

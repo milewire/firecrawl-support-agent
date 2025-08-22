@@ -1,0 +1,4 @@
+Firecrawl API lets you scrape and clean data for LLM-ready datasets.
+Example endpoint: /api/scrape
+Authentication: Bearer token
+...

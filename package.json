@@ -1,0 +1,32 @@
+{
+  "name": "firecrawl-support-agent",
+  "version": "1.0.0",
+  "description": "Discord + GitHub + Supabase support bot",
+  "type": "module",
+  "main": "discord_bot.mjs",
+  "scripts": {
+    "deploy": "node deploy-commands.mjs",
+    "start": "node discord_bot.mjs",
+    "dev": "nodemon discord_bot.mjs"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "support",
+    "supabase",
+    "openai"
+  ],
+  "license": "ISC",
+  "dependencies": {
+    "@octokit/rest": "^21.0.0",
+    "@supabase/supabase-js": "^2.55.0",
+    "body-parser": "^1.20.2",
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.1",
+    "openai": "^5.13.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
