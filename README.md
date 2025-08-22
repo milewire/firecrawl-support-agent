@@ -24,9 +24,31 @@ A powerful Discord bot that integrates with GitHub, Supabase, and OpenAI to prov
 
 ## 🛠️ Installation
 
+### Quick Start
+```bash
+# Clone the repository
+git clone https://github.com/milewire/firecrawl-support-agent.git
+cd firecrawl-support-agent
+
+# Install dependencies
+npm install
+
+# Set up environment variables (see Configuration section below)
+cp .env.example .env.local
+# Edit .env.local with your actual values
+
+# Deploy slash commands
+npm run deploy
+
+# Start the bot
+npm start
+```
+
+### Detailed Setup
+
 1. **Clone the repository**
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/milewire/firecrawl-support-agent.git
    cd firecrawl-support-agent
    ```
 
@@ -158,6 +180,8 @@ firecrawl-support-agent/
 ├── github.mjs         # GitHub API integration
 ├── docs_ingest.js     # Documentation ingestion script
 ├── agent.js           # AI agent logic
+├── test-env.js        # Environment testing utility
+├── firecrawl_api.txt  # API documentation reference
 └── package.json       # Project dependencies
 ```
 
@@ -215,11 +239,28 @@ npm start
 
 ## 📝 Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+We welcome contributions! Please follow these steps:
+
+1. **Fork the repository** on GitHub
+2. **Clone your fork** locally
+3. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
+4. **Make your changes** and commit them (`git commit -m 'Add amazing feature'`)
+5. **Push to your fork** (`git push origin feature/amazing-feature`)
+6. **Open a Pull Request** against the main repository
+
+### Development Workflow
+```bash
+# Keep your fork up to date
+git fetch upstream
+git checkout main
+git merge upstream/main
+git push origin main
+
+# Create a new feature branch
+git checkout -b feature/your-feature-name
+# Make changes, commit, and push
+git push origin feature/your-feature-name
+```
 
 ## 📄 License
 
@@ -228,16 +269,26 @@ This project is licensed under the ISC License.
 ## 🆘 Support
 
 If you encounter any issues or have questions:
-- Check the [Issues](https://github.com/your-repo/issues) page
+- Check the [Issues](https://github.com/milewire/firecrawl-support-agent/issues) page
 - Create a new issue with detailed information
 - Contact the development team
 
 ## 🔄 Updates
 
 Stay updated with the latest features and bug fixes by:
-- Watching the repository
-- Checking the releases page
+- [Watching the repository](https://github.com/milewire/firecrawl-support-agent)
+- Checking the [releases page](https://github.com/milewire/firecrawl-support-agent/releases)
 - Following the changelog
+
+## 📊 Project Status
+
+- ✅ **Core Features**: Discord bot with slash commands
+- ✅ **AI Integration**: OpenAI GPT-4o-mini integration
+- ✅ **GitHub Integration**: Automatic issue creation
+- ✅ **Supabase Integration**: Database storage
+- ✅ **Security**: Input sanitization and environment variables
+- 🔄 **Vector Search**: In development
+- 🔄 **Documentation**: In progress
 
 ---
 
