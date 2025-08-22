@@ -1,0 +1,23 @@
+name: "✨ Feature request"
+description: Propose an improvement
+labels: ["feature_request"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      placeholder: What problem would this feature solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      placeholder: Describe the command/behavior you want.
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      placeholder: Links, screenshots, similar tools, etc.
