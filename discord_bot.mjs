@@ -270,4 +270,31 @@ client.once(Events.ClientReady, (c) => {
   console.log(`✅ Logged in as ${c.user.tag}`);
 });
 
+// Simple web server for Render
+import express from 'express';
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'Firecrawl Support Agent API',
+    status: 'running',
+    bot: client.user?.tag || 'Starting...',
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    bot: client.user?.tag || 'Starting...',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Start web server
+app.listen(PORT, () => {
+  console.log(`🚀 Web server running on port ${PORT}`);
+});
+
 client.login(process.env.DISCORD_BOT_TOKEN);
