@@ -2,7 +2,7 @@
 import "dotenv/config";
 import { Client, GatewayIntentBits, Events } from "discord.js";
 import { Octokit } from "@octokit/rest";
-import { analytics } from "./analytics.js";
+// Analytics removed - will be replaced with Pinecone/Pylon integration
 
 // ---- Safety nets ----
 process.on("unhandledRejection", (r) => console.error("unhandledRejection:", r));
@@ -253,8 +253,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
       const url = await createIssue({ title, body, labels });
       
-      // Track analytics
-      await analytics.trackTicket('discord', t.category, finalSeverity);
+      // Analytics tracking will be added with Pinecone/Pylon integration
       
       await interaction.editReply(`✅ Ticket created: ${url}`);
     } catch (e) {
@@ -263,14 +262,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   } else if (interaction.commandName === "analytics") {
     await interaction.deferReply({ ephemeral: true });
-    
-    try {
-      const metrics = await analytics.getMetrics();
-      const report = analytics.generateReport();
-      await interaction.editReply(report.slice(0, 1900));
-    } catch (e) {
-      await interaction.editReply(`❌ Analytics failed: ${e.message || e}`);
-    }
+    await interaction.editReply("📊 Analytics coming soon with Pinecone/Pylon integration!");
   }
 });
 

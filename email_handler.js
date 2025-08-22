@@ -1,11 +1,41 @@
 // email_handler.js
-import sgMail from '@sendgrid/mail';
+import { Client } from '@microsoft/microsoft-graph-client';
+import { ConfidentialClientApplication } from '@azure/msal-node';
 import fetch from 'node-fetch';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+// Microsoft Graph setup - Flexible for single/multi-tenant
+const getAuthority = () => {
+  if (process.env.MICROSOFT_MULTI_TENANT === 'true') {
+    return 'https://login.microsoftonline.com/common';
+  }
+  return `https://login.microsoftonline.com/${process.env.MICROSOFT_TENANT_ID}`;
+};
+
+const msalConfig = {
+  auth: {
+    clientId: process.env.MICROSOFT_CLIENT_ID,
+    clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
+    authority: getAuthority()
+  }
+};
+
+const msalClient = new ConfidentialClientApplication(msalConfig);
+
+// Get Graph client with access token
+async function getGraphClient() {
+  const authResult = await msalClient.acquireTokenByClientCredential({
+    scopes: ['https://graph.microsoft.com/.default']
+  });
+  
+  return Client.init({
+    authProvider: (done) => {
+      done(null, authResult.accessToken);
+    }
+  });
+}
 
 // Firecrawl docs cache
 let firecrawlDocs = null;
@@ -150,16 +180,30 @@ ${ticketData.message}
 }
 
 export async function sendEmailReply(to, subject, content) {
-  const msg = {
-    to: to,
-    from: process.env.SENDGRID_FROM_EMAIL,
-    subject: `Re: ${subject}`,
-    text: content,
-    html: content.replace(/\n/g, '<br>')
-  };
-
   try {
-    await sgMail.send(msg);
+    const graphClient = await getGraphClient();
+    
+    const message = {
+      subject: `Re: ${subject}`,
+      body: {
+        contentType: 'HTML',
+        content: content.replace(/\n/g, '<br>')
+      },
+      toRecipients: [
+        {
+          emailAddress: {
+            address: to
+          }
+        }
+      ]
+    };
+
+    await graphClient.api('/users/' + process.env.MICROSOFT_USER_ID + '/sendMail')
+      .post({
+        message: message,
+        saveToSentItems: true
+      });
+
     console.log(`Email reply sent to ${to}`);
     return true;
   } catch (error) {

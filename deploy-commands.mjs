@@ -47,10 +47,10 @@ const commands = [
     ],
   },
 
-  // Analytics (show support metrics)
+  // Analytics (placeholder for Pinecone/Pylon)
   {
     name: "analytics",
-    description: "Show support analytics (24h)",
+    description: "Show support analytics (coming soon)",
   }
 ];
 
@@ -60,7 +60,7 @@ const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_BOT_TOKEN)
   try {
     console.log("⏳ Refreshing application (/) commands...");
     await rest.put(
-      Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
+      Routes.applicationGuildCommands(process.env.DISCORD_CLIENT_ID, process.env.DISCORD_GUILD_ID),
       { body: commands }
     );
     console.log("✅ Successfully reloaded application (/) commands.");

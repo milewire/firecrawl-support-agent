@@ -249,8 +249,11 @@ npm start
 | `GITHUB_TOKEN`      | GitHub personal access token (repo)    | ✅ |
 | `GITHUB_OWNER`      | GitHub owner (user or org)             | ✅ |
 | `GITHUB_REPO`       | Repository name (e.g., firecrawl-support-agent) | ✅ |
-| `SENDGRID_API_KEY`  | SendGrid API key for email support     | ✅ |
-| `SENDGRID_FROM_EMAIL` | Verified sender email address         | ✅ |
+| `MICROSOFT_CLIENT_ID` | Microsoft Azure app client ID         | ✅ |
+| `MICROSOFT_CLIENT_SECRET` | Microsoft Azure app client secret   | ✅ |
+| `MICROSOFT_TENANT_ID` | Microsoft Azure tenant ID (single tenant) | ✅ |
+| `MICROSOFT_MULTI_TENANT` | Set to 'true' for multi-tenant mode | ❌ |
+| `MICROSOFT_USER_ID` | Microsoft 365 user ID for sending     | ✅ |
 | `FIRECRAWL_API_KEY` | Firecrawl API key for docs access      | ✅ |
 | `FIRECRAWL_DOCS_URL` | Firecrawl documentation URL           | ✅ |
 | `SUPABASE_URL`      | Supabase project URL                   | ❌ |
