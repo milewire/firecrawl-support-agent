@@ -15,7 +15,8 @@ const requiredVars = [
   'MICROSOFT_TENANT_ID',
   'MICROSOFT_USER_ID',
   'FIRECRAWL_API_KEY',
-  'FIRECRAWL_DOCS_URL'
+  'FIRECRAWL_DOCS_URL',
+  'PINECONE_API_KEY'
 ];
 
 console.log("🔍 Environment Variables Test\n");
