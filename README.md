@@ -249,6 +249,10 @@ npm start
 | `GITHUB_TOKEN`      | GitHub personal access token (repo)    | ✅ |
 | `GITHUB_OWNER`      | GitHub owner (user or org)             | ✅ |
 | `GITHUB_REPO`       | Repository name (e.g., firecrawl-support-agent) | ✅ |
+| `SENDGRID_API_KEY`  | SendGrid API key for email support     | ✅ |
+| `SENDGRID_FROM_EMAIL` | Verified sender email address         | ✅ |
+| `FIRECRAWL_API_KEY` | Firecrawl API key for docs access      | ✅ |
+| `FIRECRAWL_DOCS_URL` | Firecrawl documentation URL           | ✅ |
 | `SUPABASE_URL`      | Supabase project URL                   | ❌ |
 | `SUPABASE_KEY`      | Supabase anon key                      | ❌ |
 

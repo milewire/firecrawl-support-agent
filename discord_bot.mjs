@@ -2,6 +2,7 @@
 import "dotenv/config";
 import { Client, GatewayIntentBits, Events } from "discord.js";
 import { Octokit } from "@octokit/rest";
+import { analytics } from "./analytics.js";
 
 // ---- Safety nets ----
 process.on("unhandledRejection", (r) => console.error("unhandledRejection:", r));
@@ -20,6 +21,17 @@ async function aiAsk(text, { timeoutMs = 15000 } = {}) {
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), timeoutMs);
 
+  const firecrawlContext = `
+You are a Firecrawl support expert. Firecrawl is a web scraping API that helps developers get LLM-ready data.
+
+Key Firecrawl Information:
+- API Endpoints: /scrape, /sitemap, /search
+- Rate Limits: 1000 requests/hour
+- Common Issues: rate limits, invalid URLs, API errors, billing
+- Documentation: ${process.env.FIRECRAWL_DOCS_URL || 'https://docs.firecrawl.dev'}
+
+Be concise and accurate in your response.`;
+
   const res = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
     headers: {
@@ -28,7 +40,7 @@ async function aiAsk(text, { timeoutMs = 15000 } = {}) {
     },
     body: JSON.stringify({
       model: "gpt-4o-mini",
-      input: `You are a helpful support agent. Be concise and accurate.\n\nUser: ${text}`,
+      input: `${firecrawlContext}\n\nUser: ${text}`,
       max_output_tokens: 400,
     }),
     signal: controller.signal,
@@ -50,7 +62,7 @@ function normalizeTriage(parsed, original) {
   const q = String(original || "");
   const lq = q.toLowerCase();
 
-  const catEnum = ["bug", "question", "billing", "feature_request", "usage", "other"];
+  const catEnum = ["api_error", "rate_limit", "billing", "integration", "question", "other"];
   const sevEnum = ["low", "medium", "high", "critical"];
 
   let summary = parsed?.summary && String(parsed.summary).trim();
@@ -58,11 +70,12 @@ function normalizeTriage(parsed, original) {
 
   let category = (parsed?.category || "").toLowerCase();
   if (!catEnum.includes(category)) {
-    if (/(error|exception|stack|500|fail|bug|crash|timeout|broken)/.test(lq)) category = "bug";
-    else if (/(price|billing|invoice|charge|payment|refund)/.test(lq)) category = "billing";
-    else if (/(feature|request|roadmap|add|support new)/.test(lq)) category = "feature_request";
-    else if (/(usage|example|tutorial|docs|how|help)/.test(lq)) category = "usage";
-    else category = "question";
+    if (/(error|exception|stack|500|fail|crash|timeout|broken|api|scrape)/.test(lq)) category = "api_error";
+    else if (/(rate.?limit|429|too.?many|quota|limit)/.test(lq)) category = "rate_limit";
+    else if (/(price|billing|invoice|charge|payment|refund|subscription)/.test(lq)) category = "billing";
+    else if (/(integration|sdk|library|code|example|tutorial|how)/.test(lq)) category = "integration";
+    else if (/(usage|docs|help|question)/.test(lq)) category = "question";
+    else category = "other";
   }
 
   let severity = (parsed?.severity || "").toLowerCase();
@@ -239,9 +252,24 @@ client.on(Events.InteractionCreate, async (interaction) => {
         (t.suggested_reply ? `**Suggested reply:**\n${t.suggested_reply}\n` : "");
 
       const url = await createIssue({ title, body, labels });
+      
+      // Track analytics
+      await analytics.trackTicket('discord', t.category, finalSeverity);
+      
       await interaction.editReply(`✅ Ticket created: ${url}`);
     } catch (e) {
       await interaction.editReply(`❌ Ticket failed: ${e.message || e}`);
+    }
+
+  } else if (interaction.commandName === "analytics") {
+    await interaction.deferReply({ ephemeral: true });
+    
+    try {
+      const metrics = await analytics.getMetrics();
+      const report = analytics.generateReport();
+      await interaction.editReply(report.slice(0, 1900));
+    } catch (e) {
+      await interaction.editReply(`❌ Analytics failed: ${e.message || e}`);
     }
   }
 });

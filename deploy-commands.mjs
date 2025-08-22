@@ -45,6 +45,12 @@ const commands = [
       },
       { type: 5, name: "private", description: "Reply only visible to you?" }
     ],
+  },
+
+  // Analytics (show support metrics)
+  {
+    name: "analytics",
+    description: "Show support analytics (24h)",
   }
 ];
 
