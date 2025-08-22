@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "description": "Discord + GitHub + Supabase support bot",
   "type": "module",
-  "main": "discord_bot.mjs",
+  "main": "render-bot.mjs",
   "scripts": {
     "deploy": "node deploy-commands.mjs",
     "start": "node render-bot.mjs",
