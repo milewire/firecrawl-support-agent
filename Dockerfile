@@ -14,5 +14,5 @@ COPY . .
 # Expose port (Railway will handle this)
 EXPOSE 3000
 
-# Start the bot
-CMD ["npm", "start"]
+# Start the simplified Railway bot
+CMD ["node", "railway-bot.mjs"]
