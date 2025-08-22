@@ -3,19 +3,13 @@ import "dotenv/config";
 import { Client, GatewayIntentBits, Events } from "discord.js";
 import { Octokit } from "@octokit/rest";
 
-// ---- Safety nets (log silent crashes) ----
+// ---- Safety nets ----
 process.on("unhandledRejection", (r) => console.error("unhandledRejection:", r));
 process.on("uncaughtException", (e) => console.error("uncaughtException:", e));
 
-// ---- Sanitizer to avoid leaking sensitive bits in GitHub issues ----
+// ---- No masking (pass-through) ----
 function sanitize(s) {
-  return String(s || "")
-    // redact emails
-    .replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, "[redacted-email]")
-    // redact tokens in query strings like ?token=abc123
-    .replace(/(?<=token=)[^&\s]+/gi, "[redacted-token]")
-    // trim very long URLs so issues don’t explode
-    .replace(/https?:\/\/\S+/g, (u) => (u.length > 80 ? u.slice(0, 80) + "…[truncated]" : u));
+  return String(s ?? ""); // intentionally no redaction
 }
 
 // ---- Discord client ----
@@ -42,10 +36,7 @@ async function aiAsk(text, { timeoutMs = 15000 } = {}) {
 
   clearTimeout(t);
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    const err = data?.error?.message || `${res.status} ${res.statusText}`;
-    throw new Error(err);
-  }
+  if (!res.ok) throw new Error(data?.error?.message || `${res.status} ${res.statusText}`);
 
   return (
     data?.output?.[0]?.content?.[0]?.text ||
@@ -54,7 +45,7 @@ async function aiAsk(text, { timeoutMs = 15000 } = {}) {
   );
 }
 
-// ---- Helpers: robust triage parsing + normalization (NO MORE N/A) ----
+// ---- Triage helpers (never return N/A) ----
 function normalizeTriage(parsed, original) {
   const q = String(original || "");
   const lq = q.toLowerCase();
@@ -69,7 +60,7 @@ function normalizeTriage(parsed, original) {
   if (!catEnum.includes(category)) {
     if (/(error|exception|stack|500|fail|bug|crash|timeout|broken)/.test(lq)) category = "bug";
     else if (/(price|billing|invoice|charge|payment|refund)/.test(lq)) category = "billing";
-    else if (/(feature|request|roadmap|support new|add)/.test(lq)) category = "feature_request";
+    else if (/(feature|request|roadmap|add|support new)/.test(lq)) category = "feature_request";
     else if (/(usage|example|tutorial|docs|how|help)/.test(lq)) category = "usage";
     else category = "question";
   }
@@ -81,11 +72,10 @@ function normalizeTriage(parsed, original) {
     else severity = "medium";
   }
 
-  let needs_human =
+  const needs_human =
     typeof parsed?.needs_human === "boolean" ? parsed.needs_human : severity !== "low";
 
-  let suggested_reply =
-    parsed?.suggested_reply && String(parsed.suggested_reply).trim();
+  let suggested_reply = parsed?.suggested_reply && String(parsed.suggested_reply).trim();
   if (!suggested_reply) {
     suggested_reply =
       "Thanks for the report! Could you share steps to reproduce, the URL, expected vs actual behavior, and any timestamps or logs?";
@@ -94,65 +84,59 @@ function normalizeTriage(parsed, original) {
   return { summary, category, severity, needs_human, suggested_reply };
 }
 
-// ---- OpenAI: triage JSON (summary/category/severity/needs_human/suggested_reply) ----
 async function triage(text) {
-  const schema = {
-    name: "SupportTriage",
-    schema: {
-      type: "object",
-      properties: {
-        summary: { type: "string" },
-        category: {
-          type: "string",
-          enum: ["bug", "question", "billing", "feature_request", "usage", "other"],
-        },
-        severity: { type: "string", enum: ["low", "medium", "high", "critical"] },
-        needs_human: { type: "boolean" },
-        suggested_reply: { type: "string" },
-      },
-      required: ["summary", "category", "severity", "needs_human", "suggested_reply"],
-      additionalProperties: false,
-    },
-    strict: true,
-  };
-
-  const res = await fetch("https://api.openai.com/v1/responses", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY || ""}`,
-    },
-    body: JSON.stringify({
-      model: "gpt-4o-mini",
-      input: `Classify the following support text. Be concise.\n\nText:\n${text}`,
-      response_format: { type: "json_schema", json_schema: schema },
-      max_output_tokens: 400,
-    }),
-  });
-
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    const err = data?.error?.message || `${res.status} ${res.statusText}`;
-    throw new Error(err);
-  }
-
-  // Handle both string JSON and object forms from Responses API
-  const content = data?.output?.[0]?.content?.[0];
-  let raw = content?.json ?? content?.text ?? null;
-
-  let parsed = null;
   try {
-    parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
-  } catch {
-    parsed = null;
-  }
+    const schema = {
+      name: "SupportTriage",
+      schema: {
+        type: "object",
+        properties: {
+          summary: { type: "string" },
+          category: { type: "string", enum: ["bug", "question", "billing", "feature_request", "usage", "other"] },
+          severity: { type: "string", enum: ["low", "medium", "high", "critical"] },
+          needs_human: { type: "boolean" },
+          suggested_reply: { type: "string" }
+        },
+        required: ["summary", "category", "severity", "needs_human", "suggested_reply"],
+        additionalProperties: false
+      },
+      strict: true
+    };
 
-  const norm = normalizeTriage(parsed, text);
-  console.log("[TRIAGE]", norm); // helpful debug
-  return norm;
+    const res = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY || ""}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        input: `Classify the following support text. Be concise.\n\nText:\n${text}`,
+        response_format: { type: "json_schema", json_schema: schema },
+        max_output_tokens: 400
+      }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data?.error?.message || `${res.status} ${res.statusText}`);
+
+    const content = data?.output?.[0]?.content?.[0];
+    const raw = content?.json ?? content?.text ?? null;
+
+    let parsed = null;
+    try { parsed = typeof raw === "string" ? JSON.parse(raw) : raw; } catch { parsed = null; }
+
+    const norm = normalizeTriage(parsed, text);
+    console.log("[TRIAGE]", norm);
+    return norm;
+  } catch {
+    const norm = normalizeTriage(null, text);
+    console.log("[TRIAGE:fallback]", norm);
+    return norm;
+  }
 }
 
-// ---- GitHub helper ----
+// ---- GitHub ----
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 async function createIssue({ title, body, labels = [] }) {
   const owner = process.env.GITHUB_OWNER;
@@ -164,7 +148,7 @@ async function createIssue({ title, body, labels = [] }) {
   return data.html_url;
 }
 
-// ---- Command Handlers ----
+// ---- Commands ----
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
@@ -222,30 +206,37 @@ client.on(Events.InteractionCreate, async (interaction) => {
     console.log(`[TICKET] ${interaction.user.tag}: ${title}`);
 
     try {
-      // Auto-triage description (always returns filled values)
-      const t = await triage(description).catch(() => null);
+      // Auto-triage description
+      const t = await triage(description);
 
-      // --- sanitize description BEFORE sending to GitHub ---
-      const safeDescription = sanitize(description);
+      // No masking: use the raw description
+      const userDescription = sanitize(description); // pass-through
 
-      const labels = Array.from(
-        new Set(
-          [
-            t?.category, // bug/question/feature_request/billing/usage/other
-            t?.severity, // low/medium/high/critical
-            severityOpt, // optional override
-          ].filter(Boolean)
-        )
-      );
+      // One canonical severity: user > AI > medium
+      const finalSeverity = (severityOpt || t.severity || "medium").toLowerCase();
 
+      // Namespaced labels (+ conflict flag only when they differ)
+      const labels = Array.from(new Set([
+        t.category ? `type/${t.category}` : "type/question",
+        `severity/${finalSeverity}`,
+        "ai-triaged",
+        (severityOpt && t.severity && severityOpt.toLowerCase() !== t.severity.toLowerCase())
+          ? "triage/conflict"
+          : null
+      ].filter(Boolean)));
+
+      // Full issue body
       const body =
-        `**Summary:** ${t?.summary ?? "N/A"}\n\n` +
-        `**Category:** ${t?.category ?? "N/A"}\n` +
-        `**Severity:** ${t?.severity ?? (severityOpt || "N/A")}\n` +
-        `**Needs human:** ${t?.needs_human ? "Yes" : "No"}\n\n` +
+        `**Summary:** ${t.summary}\n\n` +
+        `**Category:** ${t.category}\n` +
+        `**Severity:** ${finalSeverity}` +
+        ((severityOpt && t.severity && severityOpt.toLowerCase() !== t.severity.toLowerCase())
+          ? ` (user: ${severityOpt}, ai: ${t.severity})`
+          : ``) + `\n` +
+        `**Needs human:** ${t.needs_human ? "Yes" : "No"}\n\n` +
         `**Reporter:** ${interaction.user.tag} (${interaction.user.id})\n\n` +
-        `**User Description:**\n${safeDescription}\n\n` +
-        (t?.suggested_reply ? `**Suggested reply:**\n${t.suggested_reply}\n` : "");
+        `**User Description:**\n${userDescription}\n\n` +
+        (t.suggested_reply ? `**Suggested reply:**\n${t.suggested_reply}\n` : "");
 
       const url = await createIssue({ title, body, labels });
       await interaction.editReply(`✅ Ticket created: ${url}`);

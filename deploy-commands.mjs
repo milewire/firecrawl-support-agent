@@ -13,29 +13,29 @@ const commands = [
     name: "ask",
     description: "Ask the AI a support question",
     options: [
-      { type: 3, name: "q", description: "Your question", required: true },   // STRING
-      { type: 5, name: "private", description: "Reply only visible to you?" } // BOOLEAN
+      { type: 3, name: "q", description: "Your question", required: true },
+      { type: 5, name: "private", description: "Reply only visible to you?" }
     ],
   },
 
-  // Triage (classify text -> category/severity/needs-human)
+  // Triage (classify text)
   {
     name: "triage",
     description: "Classify text (category, severity, needs-human)",
     options: [
-      { type: 3, name: "text", description: "Content to triage", required: true } // STRING
+      { type: 3, name: "text", description: "Content to triage", required: true }
     ],
   },
 
-  // Ticket (create GitHub issue)
+  // Ticket (create GitHub issue with full details)
   {
     name: "ticket",
     description: "Create a GitHub issue",
     options: [
-      { type: 3, name: "title", description: "Issue title", required: true },         // STRING
-      { type: 3, name: "description", description: "Describe the problem", required: true }, // STRING
+      { type: 3, name: "title", description: "Issue title", required: true },
+      { type: 3, name: "description", description: "Describe the problem", required: true },
       {
-        type: 3, name: "severity", description: "Optional severity label",
+        type: 3, name: "severity", description: "Optional severity",
         choices: [
           { name: "low", value: "low" },
           { name: "medium", value: "medium" },
@@ -43,7 +43,7 @@ const commands = [
           { name: "critical", value: "critical" }
         ]
       },
-      { type: 5, name: "private", description: "Reply only visible to you?" } // BOOLEAN
+      { type: 5, name: "private", description: "Reply only visible to you?" }
     ],
   }
 ];

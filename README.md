@@ -1,3 +1,5 @@
+[![CI](https://github.com/milewire/firecrawl-support-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/milewire/firecrawl-support-agent/actions/workflows/ci.yml)
+
 # Firecrawl Support Agent
 
 A powerful Discord bot that integrates with GitHub, Supabase, and OpenAI to provide intelligent support ticket management and automated customer assistance.

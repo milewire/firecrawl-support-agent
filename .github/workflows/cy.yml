@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:  # allow manual runs from Actions tab
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  node:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'   # matches your local Node 22.x
+          cache: 'npm'
+
+      - name: Install
+        run: npm ci
+
+      # Syntax-check .mjs files (no execution)
+      - name: Syntax check ESM modules
+        run: |
+          node --version
+          node --check ./discord_bot.mjs
+          if [ -f ./github.mjs ]; then node --check ./github.mjs; fi
+          if compgen -G "scripts/*.mjs" > /dev/null; then node --check scripts/*.mjs; fi
+
+      # These only run if they exist in package.json
+      - name: Lint (if present)
+        run: npm run lint --if-present
+      - name: Tests (if present)
+        run: npm test --if-present
+      - name: Build (if present)
+        run: npm run build --if-present
