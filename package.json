@@ -6,7 +6,7 @@
   "main": "discord_bot.mjs",
   "scripts": {
     "deploy": "node deploy-commands.mjs",
-    "start": "node discord_bot.mjs",
+    "start": "node render-bot.mjs",
     "server": "node server.mjs",
     "dev": "nodemon discord_bot.mjs",
     "dev:server": "nodemon server.mjs",
