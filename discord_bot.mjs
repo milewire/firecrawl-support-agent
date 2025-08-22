@@ -175,7 +175,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     await interaction.reply("✅ System is running smoothly!");
 
   } else if (interaction.commandName === "doc") {
-    await interaction.reply("📄 Documentation: https://your-docs-link-here.com");
+    await interaction.reply("📄 Documentation: https://docs.firecrawl.dev");
 
   } else if (interaction.commandName === "ask") {
     const q = interaction.options.getString("q");
