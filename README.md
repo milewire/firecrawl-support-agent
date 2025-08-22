@@ -16,11 +16,11 @@ A powerful Discord bot that integrates with GitHub, Supabase, and OpenAI to prov
 
 ## 📋 Prerequisites
 
-- Node.js 18+ 
+- Node.js 22+
 - Discord Bot Token
 - OpenAI API Key
-- Supabase Project
-- GitHub Personal Access Token
+- GitHub Personal Access Token (repo scope)
+- (Optional) Supabase project
 
 ## 🛠️ Installation
 
@@ -33,8 +33,8 @@ cd firecrawl-support-agent
 # Install dependencies
 npm install
 
-# Set up environment variables (see Configuration section below)
-# Create .env.local file with your actual values
+# Set up environment variables (see Configuration below)
+# Create a .env file with your actual values
 
 # Deploy slash commands
 npm run deploy
@@ -57,23 +57,24 @@ npm start
    ```
 
 3. **Set up environment variables**
-   Create a `.env.local` file in the root directory:
+   Create a `.env` file in the root directory:
    ```env
-   # Discord Bot Configuration
+   # Discord
    DISCORD_BOT_TOKEN=your_discord_bot_token
    CLIENT_ID=your_discord_client_id
    GUILD_ID=your_guild_id
 
-   # OpenAI Configuration
+   # OpenAI
    OPENAI_API_KEY=your_openai_api_key
 
-   # Supabase Configuration
+   # GitHub (note: owner and repo are separate)
+   GITHUB_TOKEN=your_github_personal_access_token
+   GITHUB_OWNER=your_github_username_or_org
+   GITHUB_REPO=firecrawl-support-agent
+
+   # Supabase (optional)
    SUPABASE_URL=your_supabase_project_url
    SUPABASE_KEY=your_supabase_anon_key
-
-   # GitHub Configuration
-   GITHUB_TOKEN=your_github_personal_access_token
-   GITHUB_REPO=your_github_repo_owner/repo_name
    ```
 
 4. **Deploy slash commands**
@@ -126,9 +127,9 @@ Create a GitHub issue with automatic triage and categorization.
 1. Go to the [Discord Developer Portal](https://discord.com/developers/applications)
 2. Create a new application
 3. Go to the "Bot" section and create a bot
-4. Copy the bot token to your `.env.local` file as `DISCORD_BOT_TOKEN`
-5. Copy the Client ID to your `.env.local` file as `CLIENT_ID`
-6. Copy your Guild ID to your `.env.local` file as `GUILD_ID`
+4. Copy the bot token to your `.env` file as `DISCORD_BOT_TOKEN`
+5. Copy the Client ID to your `.env` file as `CLIENT_ID`
+6. Copy your Guild ID to your `.env` file as `GUILD_ID`
 7. Enable the necessary intents (Guilds)
 
 ### Supabase Setup
@@ -150,12 +151,12 @@ Create a GitHub issue with automatic triage and categorization.
    -- For vector search (if using embeddings)
    CREATE EXTENSION IF NOT EXISTS vector;
    ```
-3. Copy your project URL and API key to `.env.local`
+3. Copy your project URL and API key to `.env`
 
 ### GitHub Integration
 1. Create a GitHub Personal Access Token with repo permissions
-2. Set the repository where issues should be created in `GITHUB_REPO`
-3. Add the token to your `.env.local` file as `GITHUB_TOKEN`
+2. Set `GITHUB_OWNER` to your GitHub user/org and `GITHUB_REPO` to the repo name
+3. Add the token to your `.env` file as `GITHUB_TOKEN`
 
 ## 📁 Project Structure
 
@@ -194,13 +195,12 @@ firecrawl-support-agent/
 └── package.json      # Project dependencies
 ```
 
-## 🔒 Security Features
+## 🔒 Security Notes
 
-- **Automatic Sanitization**: Sensitive information (emails, tokens, long URLs) is automatically redacted before sending to GitHub
-- **Environment Variables**: All sensitive configuration is stored in environment variables
-- **Input Validation**: All user inputs are validated and sanitized
-- **Private Replies**: Commands support private replies to keep sensitive information hidden
-- **Error Handling**: Comprehensive error handling with user-friendly messages
+- **No automatic redaction:** Ticket descriptions are sent to GitHub exactly as typed. Do not paste secrets (tokens/passwords) into tickets.
+- **Environment Variables:** Keep secrets in `.env` (never commit it).
+- **Private Replies:** Commands support private replies where appropriate.
+- **Error Handling:** User-friendly errors with safe logging.
 
 ## 🤖 AI Features
 
@@ -235,16 +235,17 @@ npm start
 ```
 
 ### Environment Variables Reference
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `DISCORD_BOT_TOKEN` | Discord bot token | ✅ |
-| `CLIENT_ID` | Discord application client ID | ✅ |
-| `GUILD_ID` | Discord guild/server ID | ✅ |
-| `OPENAI_API_KEY` | OpenAI API key | ✅ |
-| `SUPABASE_URL` | Supabase project URL | ✅ |
-| `SUPABASE_KEY` | Supabase anon key | ✅ |
-| `GITHUB_TOKEN` | GitHub personal access token | ✅ |
-| `GITHUB_REPO` | GitHub repository (owner/repo) | ✅ |
+| Variable          | Description                              | Required |
+|-------------------|------------------------------------------|----------|
+| `DISCORD_BOT_TOKEN` | Discord bot token                      | ✅ |
+| `CLIENT_ID`         | Discord application client ID          | ✅ |
+| `GUILD_ID`          | Discord guild/server ID                | ✅ |
+| `OPENAI_API_KEY`    | OpenAI API key                         | ✅ |
+| `GITHUB_TOKEN`      | GitHub personal access token (repo)    | ✅ |
+| `GITHUB_OWNER`      | GitHub owner (user or org)             | ✅ |
+| `GITHUB_REPO`       | Repository name (e.g., firecrawl-support-agent) | ✅ |
+| `SUPABASE_URL`      | Supabase project URL                   | ❌ |
+| `SUPABASE_KEY`      | Supabase anon key                      | ❌ |
 
 ## 📝 Contributing
 
@@ -303,4 +304,4 @@ Stay updated with the latest features and bug fixes by:
 
 ---
 
-**Note**: Make sure to keep your API keys and tokens secure and never commit them to version control. The `.env.local` file is already included in `.gitignore` for your protection.
+**Note**: Make sure to keep your API keys and tokens secure and never commit them to version control. The `.env` file is already included in `.gitignore` for your protection.
