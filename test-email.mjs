@@ -6,7 +6,7 @@ const RENDER_URL = process.env.RENDER_URL || 'https://firecrawl-support-agent.on
 async function testEmailProcessing() {
   const testEmail = {
     from: {
-      email: 'test@example.com',
+      email: 'PhillipSmith@milewireai.onmicrosoft.com',
       name: 'Test User'
     },
     subject: 'Test Support Request - API Error',
