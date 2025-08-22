@@ -272,7 +272,7 @@ client.once(Events.ClientReady, (c) => {
 
 // Simple web server for Render
 import express from 'express';
-import { setupEmailWebhook, processEmail } from './email_handler.js';
+import { setupEmailWebhook, processEmail, sendEmailReply, generateAutoReply } from './email_handler.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -315,11 +315,16 @@ app.post('/process-email', async (req, res) => {
     // Create GitHub issue
     const issue = await createIssue(result.issueData.title, result.issueData.body, result.issueData.labels);
     
+    // Send auto-reply email
+    const autoReply = generateAutoReply(result.triageResult);
+    const emailSent = await sendEmailReply(emailData.from.email || emailData.from, emailData.subject, autoReply);
+    
     res.json({ 
       success: true, 
       ticketId: result.ticketData.id,
       issueNumber: issue.number,
-      triage: result.triageResult
+      triage: result.triageResult,
+      emailReplySent: emailSent
     });
   } catch (error) {
     console.error('Error processing email:', error);
