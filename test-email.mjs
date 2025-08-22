@@ -1,7 +1,7 @@
 // test-email.mjs
 // Using built-in fetch (Node.js 18+)
 
-const RENDER_URL = process.env.RENDER_URL || 'https://YOUR-ACTUAL-RENDER-URL.onrender.com';
+const RENDER_URL = process.env.RENDER_URL || 'https://firecrawl-support-agent.onrender.com';
 
 async function testEmailProcessing() {
   const testEmail = {

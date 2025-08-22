@@ -272,8 +272,13 @@ client.once(Events.ClientReady, (c) => {
 
 // Simple web server for Render
 import express from 'express';
+import { setupEmailWebhook, processEmail } from './email_handler.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
   res.json({ 
@@ -292,9 +297,41 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Email webhook
+setupEmailWebhook(app);
+
+// Manual email processing endpoint (for testing)
+app.post('/process-email', async (req, res) => {
+  try {
+    const { from, subject, text, html } = req.body;
+    
+    if (!from || !subject || (!text && !html)) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const emailData = { from, subject, text, html };
+    const result = await processEmail(emailData);
+    
+    // Create GitHub issue
+    const issue = await createIssue(result.issueData.title, result.issueData.body, result.issueData.labels);
+    
+    res.json({ 
+      success: true, 
+      ticketId: result.ticketData.id,
+      issueNumber: issue.number,
+      triage: result.triageResult
+    });
+  } catch (error) {
+    console.error('Error processing email:', error);
+    res.status(500).json({ error: 'Failed to process email' });
+  }
+});
+
 // Start web server
 app.listen(PORT, () => {
   console.log(`🚀 Web server running on port ${PORT}`);
+  console.log(`📧 Email webhook: http://localhost:${PORT}/email-webhook`);
+  console.log(`🔧 Health check: http://localhost:${PORT}/health`);
 });
 
 client.login(process.env.DISCORD_BOT_TOKEN);
