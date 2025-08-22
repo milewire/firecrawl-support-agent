@@ -230,7 +230,7 @@ export async function setupEmailWebhook(app) {
   });
 }
 
-function generateAutoReply(triageResult) {
+export function generateAutoReply(triageResult) {
   const replies = {
     api_error: `Thank you for contacting Firecrawl support. We've received your API issue and our team will investigate shortly. We'll update you within 2 hours.`,
     rate_limit: `Thank you for your message. We understand you're experiencing rate limiting issues. Our team will review your account and get back to you soon.`,
