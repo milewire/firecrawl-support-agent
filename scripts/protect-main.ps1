@@ -1,8 +1,13 @@
 # scripts/protect-main.ps1
 Param(
-  [string]$Owner = $env:GITHUB_OWNER ?? "milewire",
-  [string]$Repo  = $env:GITHUB_REPO  ?? "firecrawl-support-agent"
+  [string]$Owner,
+  [string]$Repo
 )
+
+if (-not $Owner) { $Owner = $env:GITHUB_OWNER }
+if (-not $Repo)  { $Repo  = $env:GITHUB_REPO }
+if (-not $Owner) { $Owner = "milewire" }
+if (-not $Repo)  { $Repo  = "firecrawl-support-agent" }
 
 if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
   Write-Error "GitHub CLI (gh) is not installed. Install from https://cli.github.com/ and run 'gh auth login'."
