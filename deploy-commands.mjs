@@ -51,7 +51,9 @@ const commands = [
   {
     name: "analytics",
     description: "Show support analytics (coming soon)",
-  }
+  },
+
+
 ];
 
 const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_BOT_TOKEN);

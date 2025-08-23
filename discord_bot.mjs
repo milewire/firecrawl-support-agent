@@ -260,23 +260,28 @@ client.on(Events.InteractionCreate, async (interaction) => {
       await interaction.editReply(`❌ Ticket failed: ${e.message || e}`);
     }
 
-  } else if (interaction.commandName === "analytics") {
-    await interaction.deferReply({ ephemeral: true });
-    await interaction.editReply("📊 Analytics coming soon with Pinecone/Pylon integration!");
-  }
-});
+    } else if (interaction.commandName === "analytics") {
+      await interaction.deferReply({ ephemeral: true });
+      await interaction.editReply("📊 Analytics coming soon with Pinecone/Pylon integration!");
+    }
+  });
 
 client.once(Events.ClientReady, (c) => {
   console.log(`✅ Logged in as ${c.user.tag}`);
   
-  // Start autonomous email polling
-  startEmailPolling(2); // Poll every 2 minutes
+  // Setup email webhook
+  setupEmailWebhook(app);
+  
+  // Create webhook subscription
+  createEmailSubscription().catch(error => {
+    console.error('❌ Failed to create webhook subscription:', error);
+  });
 });
 
 // Simple web server for Render
 import express from 'express';
 import { setupEmailWebhook, processEmail, sendEmailReply, generateAutoReply } from './email_handler.js';
-import { startEmailPolling } from './email_poller.js';
+import { createEmailSubscription, listSubscriptions, deleteSubscription } from './webhook_email_handler.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -330,8 +335,13 @@ app.post('/process-email', async (req, res) => {
     console.log('📧 GitHub issue created:', issueUrl);
     
     // Send auto-reply email
+    console.log('📧 About to send auto-reply...');
     const autoReply = generateAutoReply(result.triageResult);
-    const emailSent = await sendEmailReply(emailData.from.email || emailData.from, emailData.subject, autoReply);
+    console.log('📧 Auto-reply content:', autoReply);
+    const replyToEmail = emailData.from.email || (typeof emailData.from === 'string' ? emailData.from : null);
+    console.log('📧 Reply to email:', replyToEmail);
+    console.log('📧 Subject:', emailData.subject);
+    const emailSent = await sendEmailReply(replyToEmail, emailData.subject, autoReply);
     console.log('📧 Auto-reply sent:', emailSent);
     
     res.json({ 

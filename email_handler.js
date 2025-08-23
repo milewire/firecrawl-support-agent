@@ -289,6 +289,16 @@ export async function sendEmailReply(to, subject, content) {
   try {
     const graphClient = await getGraphClient();
     
+    // Debug environment variables
+    console.log('🔍 Email sending debug:');
+    console.log('- REPLY_FROM_EMAIL:', process.env.REPLY_FROM_EMAIL);
+    console.log('- MICROSOFT_USER_ID:', process.env.MICROSOFT_USER_ID);
+    console.log('- To:', to);
+    console.log('- Subject:', subject);
+    
+    // Use a custom reply-from address if configured, otherwise use the default
+    const replyFromAddress = process.env.REPLY_FROM_EMAIL || process.env.MICROSOFT_USER_ID;
+    
     const message = {
       subject: `Re: ${subject}`,
       body: {
@@ -304,16 +314,23 @@ export async function sendEmailReply(to, subject, content) {
       ]
     };
 
+    // Note: We can't use custom 'from' address due to Microsoft Graph permissions
+    // The email will be sent from the authenticated user's address
+    console.log('📧 Email will be sent from authenticated user:', process.env.MICROSOFT_USER_ID);
+
+    console.log('📧 Sending email with message:', JSON.stringify(message, null, 2));
+
     await graphClient.api('/users/' + process.env.MICROSOFT_USER_ID + '/sendMail')
       .post({
         message: message,
         saveToSentItems: true
       });
 
-    console.log(`Email reply sent to ${to}`);
+    console.log(`✅ Email reply sent to ${to} from ${replyFromAddress}`);
     return true;
   } catch (error) {
-    console.error('Error sending email reply:', error);
+    console.error('❌ Error sending email reply:', error);
+    console.error('❌ Error details:', error.message);
     return false;
   }
 }
