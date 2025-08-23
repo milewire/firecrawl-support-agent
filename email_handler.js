@@ -148,6 +148,8 @@ async function fetchFirecrawlDocs() {
   }
 }
 
+import PylonIntegration from './pylon_integration.js';
+
 export async function processEmail(emailData) {
   const { from, subject, text, html } = emailData;
   
@@ -174,7 +176,30 @@ export async function processEmail(emailData) {
     labels: triageResult.labels
   };
 
-  return { ticketData, triageResult, issueData };
+  // Initialize Pylon integration (optional)
+  const pylon = new PylonIntegration();
+  
+  // Route to Pylon workflow for orchestration (if configured)
+  const pylonResult = await pylon.routeTicket({
+    ticketData,
+    triageResult,
+    issueData
+  });
+
+  // Execute automated response if appropriate (uses built-in if Pylon not configured)
+  const autoResponse = await pylon.executeAutomatedResponse({
+    ticketData,
+    triageResult,
+    issueData
+  });
+
+  return { 
+    ticketData, 
+    triageResult, 
+    issueData, 
+    pylonResult,
+    autoResponse 
+  };
 }
 
 async function triageEmail(ticketData) {

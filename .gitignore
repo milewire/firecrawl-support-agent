@@ -58,7 +58,7 @@ jspm_packages/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variables file
+# Environment variables and secrets - CRITICAL SECURITY
 .env
 .env.test
 .env.production
@@ -67,6 +67,8 @@ jspm_packages/
 .env.test.local
 .env.production.local
 .env.example
+.env.*
+!.env.example
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -122,15 +124,36 @@ config/*.json
 discord_bot.log
 bot.log
 
-# API keys and secrets
+# API keys and secrets - COMPREHENSIVE SECURITY
 *.pem
 *.key
 *.crt
 *.p12
 *.pfx
+*.p8
+*.pem
 secrets.json
 credentials.json
 token.json
+auth.json
+service-account.json
+firebase-key.json
+google-credentials.json
+azure-credentials.json
+aws-credentials.json
+*.key.json
+*.secret
+*.token
+*.auth
+*.credential
+*.password
+*.private
+*.secret.json
+*.token.json
+*.auth.json
+*.credential.json
+*.password.json
+*.private.json
 
 # Database files
 *.db
@@ -161,6 +184,17 @@ commands.json
 # OpenAI API keys and configs
 openai_config.json
 openai_keys.json
+openai_credentials.json
+
+# Microsoft/Azure specific
+azure_config.json
+microsoft_credentials.json
+*.pfx
+*.p12
+
+# GitHub specific
+github_token.txt
+github_credentials.json
 
 # Supabase local development
 .supabase/
@@ -198,3 +232,31 @@ screenshots/
 # OS specific
 desktop.ini
 $RECYCLE.BIN/
+
+# Additional security patterns
+*secret*
+*token*
+*password*
+*credential*
+*auth*
+*private*
+*key*
+*api_key*
+*client_secret*
+*access_token*
+*refresh_token*
+
+# Exclude these patterns from the above if they're legitimate code files
+!**/node_modules/**
+!**/package.json
+!**/package-lock.json
+!**/yarn.lock
+!**/pnpm-lock.yaml
+!**/README.md
+!**/LICENSE
+!**/.gitignore
+!**/.github/**
+!**/scripts/**
+!**/commands/**
+!**/events/**
+!**/knowledge/**
