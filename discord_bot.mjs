@@ -281,7 +281,7 @@ client.once(Events.ClientReady, (c) => {
 // Simple web server for Render
 import express from 'express';
 import { setupEmailWebhook, processEmail, sendEmailReply, generateAutoReply } from './email_handler.js';
-import { createEmailSubscription, listSubscriptions, deleteSubscription } from './webhook_email_handler.js';
+import { createEmailSubscription, listSubscriptions, deleteSubscription } from './email_handler.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
