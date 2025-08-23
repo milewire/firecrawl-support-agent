@@ -282,6 +282,12 @@ client.once(Events.ClientReady, (c) => {
 import express from 'express';
 import { setupEmailWebhook, processEmail, sendEmailReply, generateAutoReply } from './email_handler.js';
 import { createEmailSubscription, listSubscriptions, deleteSubscription } from './email_handler.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -289,13 +295,11 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Serve static files from public directory
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.get('/', (req, res) => {
-  res.json({ 
-    message: 'Firecrawl Support Agent API',
-    status: 'running',
-    bot: client.user?.tag || 'Starting...',
-    timestamp: new Date().toISOString()
-  });
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.get('/health', (req, res) => {
