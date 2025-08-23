@@ -37,6 +37,50 @@ async function getGraphClient() {
   });
 }
 
+// Microsoft Graph Webhook Subscription Management
+export async function createEmailSubscription() {
+  try {
+    const graphClient = await getGraphClient();
+    
+    const subscription = {
+      changeType: 'created',
+      notificationUrl: `${process.env.BOT_WEBHOOK_URL || 'https://firecrawl-support-agent.onrender.com'}/email-webhook`,
+      resource: `/users/${process.env.MICROSOFT_USER_ID}/messages`,
+      expirationDateTime: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days
+      clientState: 'firecrawl-support-agent'
+    };
+
+    const result = await graphClient.api('/subscriptions').post(subscription);
+    console.log('✅ Email subscription created:', result.id);
+    return result;
+  } catch (error) {
+    console.error('❌ Error creating email subscription:', error);
+    throw error;
+  }
+}
+
+export async function listSubscriptions() {
+  try {
+    const graphClient = await getGraphClient();
+    const result = await graphClient.api('/subscriptions').get();
+    return result.value;
+  } catch (error) {
+    console.error('❌ Error listing subscriptions:', error);
+    throw error;
+  }
+}
+
+export async function deleteSubscription(subscriptionId) {
+  try {
+    const graphClient = await getGraphClient();
+    await graphClient.api(`/subscriptions/${subscriptionId}`).delete();
+    console.log('✅ Subscription deleted:', subscriptionId);
+  } catch (error) {
+    console.error('❌ Error deleting subscription:', error);
+    throw error;
+  }
+}
+
 // Firecrawl docs cache
 let firecrawlDocs = null;
 let lastDocsUpdate = 0;
@@ -265,18 +309,64 @@ export async function sendEmailReply(to, subject, content) {
 }
 
 export async function setupEmailWebhook(app) {
+  // Microsoft Graph webhook validation endpoint
+  app.get('/email-webhook', (req, res) => {
+    const validationToken = req.query.validationToken;
+    if (validationToken) {
+      console.log('✅ Microsoft Graph webhook validation:', validationToken);
+      res.set('Content-Type', 'text/plain');
+      res.send(validationToken);
+    } else {
+      res.status(400).json({ error: 'Missing validation token' });
+    }
+  });
+
+  // Microsoft Graph webhook notification endpoint
   app.post('/email-webhook', async (req, res) => {
     try {
-      const emailData = req.body;
-      const result = await processEmail(emailData);
+      console.log('📧 Received Microsoft Graph webhook notification');
       
-      // Send auto-reply
-      const autoReply = generateAutoReply(result.triageResult);
-      await sendEmailReply(emailData.from, emailData.subject, autoReply);
+      // Handle subscription lifecycle notifications
+      if (req.body.value && req.body.value.length > 0) {
+        for (const notification of req.body.value) {
+          if (notification.resourceData) {
+            // This is a new email notification
+            console.log('📧 Processing new email notification');
+            
+            // Fetch the actual email content
+            const graphClient = await getGraphClient();
+            const email = await graphClient.api(notification.resource).get();
+            
+            // Process the email
+            const emailData = {
+              from: email.from.emailAddress,
+              subject: email.subject,
+              text: email.body.content,
+              html: email.body.content
+            };
+            
+            const result = await processEmail(emailData);
+            
+            // Create GitHub issue
+            const { createIssue } = await import('./github.mjs');
+            const issueUrl = await createIssue({
+              title: result.issueData.title,
+              body: result.issueData.body,
+              labels: result.issueData.labels
+            });
+            
+            // Send auto-reply
+            const autoReply = generateAutoReply(result.triageResult);
+            await sendEmailReply(emailData.from.address, emailData.subject, autoReply);
+            
+            console.log('✅ Email processed successfully:', issueUrl);
+          }
+        }
+      }
       
-      res.status(200).json({ success: true, ticketId: result.ticketData.id });
+      res.status(202).send(); // Microsoft expects 202 for webhook notifications
     } catch (error) {
-      console.error('Email webhook error:', error);
+      console.error('❌ Email webhook error:', error);
       res.status(500).json({ error: 'Failed to process email' });
     }
   });
