@@ -3,13 +3,12 @@
   "version": "1.0.1",
   "description": "Discord + GitHub + Supabase support bot",
   "type": "module",
-  "main": "render-bot.mjs",
+  "main": "discord_bot.mjs",
   "scripts": {
     "deploy": "node deploy-commands.mjs",
-    "start": "node render-bot.mjs",
-    "server": "node server.mjs",
+    "start": "node discord_bot.mjs",
     "dev": "nodemon discord_bot.mjs",
-    "dev:server": "nodemon server.mjs",
+
     "seed:labels": "node scripts/seed-labels.mjs",
     "protect:main:ps": "powershell -ExecutionPolicy Bypass -File scripts/protect-main.ps1",
     "protect:main:sh": "bash scripts/protect-main.sh",

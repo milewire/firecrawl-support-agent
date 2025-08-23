@@ -47,25 +47,50 @@ async function fetchFirecrawlDocs() {
     return firecrawlDocs;
   }
 
+  // Use a fallback URL if the main one fails
+  const docsUrl = process.env.FIRECRAWL_DOCS_URL || 'https://docs.firecrawl.dev';
+  
   try {
-    const response = await fetch(process.env.FIRECRAWL_DOCS_URL, {
-      headers: {
-        'Authorization': `Bearer ${process.env.FIRECRAWL_API_KEY}`,
-        'Content-Type': 'application/json'
+    // Try to fetch from the configured URL first
+    if (process.env.FIRECRAWL_DOCS_URL && process.env.FIRECRAWL_API_KEY) {
+      const response = await fetch(process.env.FIRECRAWL_DOCS_URL, {
+        headers: {
+          'Authorization': `Bearer ${process.env.FIRECRAWL_API_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const docs = await response.json();
+        firecrawlDocs = docs;
+        lastDocsUpdate = Date.now();
+        return docs;
       }
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch docs: ${response.status}`);
     }
-
-    const docs = await response.json();
-    firecrawlDocs = docs;
+    
+    // Fallback: return basic Firecrawl info
+    const fallbackDocs = {
+      name: "Firecrawl",
+      description: "Web scraping API for LLM-ready data",
+      endpoints: ["/scrape", "/sitemap", "/search"],
+      rateLimit: "1000 requests/hour",
+      commonIssues: ["rate limits", "invalid URLs", "API errors", "billing"]
+    };
+    
+    firecrawlDocs = fallbackDocs;
     lastDocsUpdate = Date.now();
-    return docs;
+    return fallbackDocs;
   } catch (error) {
     console.error('Error fetching Firecrawl docs:', error);
-    return null;
+    // Return fallback docs even on error
+    const fallbackDocs = {
+      name: "Firecrawl",
+      description: "Web scraping API for LLM-ready data",
+      endpoints: ["/scrape", "/sitemap", "/search"],
+      rateLimit: "1000 requests/hour",
+      commonIssues: ["rate limits", "invalid URLs", "API errors", "billing"]
+    };
+    return fallbackDocs;
   }
 }
 
@@ -121,7 +146,7 @@ Categorize this email as one of:
 
 Severity levels: low, medium, high, critical
 
-Respond with JSON only:
+Respond with ONLY valid JSON (no markdown, no code blocks):
 {
   "category": "category_name",
   "severity": "severity_level",
@@ -147,8 +172,35 @@ Respond with JSON only:
     });
 
     const data = await response.json();
-    const result = JSON.parse(data.choices[0].message.content);
-    return result;
+    let content = data.choices[0].message.content;
+    
+    // Clean up the response - remove markdown formatting if present
+    content = content.replace(/```json\s*/g, '').replace(/```\s*$/g, '').trim();
+    
+    try {
+      const result = JSON.parse(content);
+      return result;
+    } catch (parseError) {
+      console.error('Failed to parse AI response as JSON:', content);
+      // Try to extract JSON from the response
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        try {
+          return JSON.parse(jsonMatch[0]);
+        } catch (e) {
+          console.error('Failed to parse extracted JSON:', e);
+        }
+      }
+      
+      // Return fallback result
+      return {
+        category: 'other',
+        severity: 'medium',
+        labels: ['type/other', 'severity/medium'],
+        summary: 'Unable to categorize',
+        needsHuman: true
+      };
+    }
   } catch (error) {
     console.error('Error triaging email:', error);
     return {
