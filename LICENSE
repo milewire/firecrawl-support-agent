@@ -1,12 +1,29 @@
-ISC License
+PROPRIETARY SOFTWARE LICENSE
 
-Copyright (c) 2025 Milewire
+Copyright (c) 2025 Phillip Smith (milewire)
 
-Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted,
-provided that the above copyright notice and this permission notice appear in all copies.
+All rights reserved.
 
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
-IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-PERFORMANCE OF THIS SOFTWARE.
+This software and associated documentation files (the "Software") are the 
+proprietary and confidential information of Phillip Smith. The Software is 
+provided solely for evaluation purposes by Firecrawl for the Customer Support 
+Engineer Agent position application.
+
+RESTRICTIONS:
+- No copying, modification, distribution, or commercial use without explicit 
+  written permission from Phillip Smith
+- No reverse engineering, decompilation, or disassembly
+- No removal of copyright notices or proprietary markings
+- Evaluation access only - no production deployment without permission
+
+PERMITTED USE:
+- Testing and evaluation of the AI Support Agent functionality
+- Code review for hiring assessment purposes
+- Demonstration of technical capabilities
+
+This license terminates automatically if you fail to comply with any of its 
+terms and conditions. Upon termination, you must cease all use of the Software.
+
+For licensing inquiries: phillipsmith@milewireai.onmicrosoft.com
+
+This Software is provided "AS IS" without warranty of any kind.

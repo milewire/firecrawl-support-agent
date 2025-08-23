@@ -2,6 +2,21 @@
 
 **A comprehensive AI-powered customer support system designed specifically for Firecrawl's support engineering needs.**
 
+## ⚠️ **IMPORTANT: PROPRIETARY SOFTWARE**
+
+**Copyright (c) 2025 Phillip Smith (milewire) - All Rights Reserved**
+
+This software is provided solely for evaluation purposes by Firecrawl for the Customer Support Engineer Agent position application. 
+
+**RESTRICTIONS:**
+- No copying, modification, distribution, or commercial use without explicit written permission
+- No reverse engineering, decompilation, or disassembly
+- Evaluation access only - no production deployment without permission
+
+**For licensing inquiries:** phillipsmith@milewireai.onmicrosoft.com
+
+---
+
 ## 🎯 **Project Overview**
 
 This AI Support Agent demonstrates advanced capabilities in:
