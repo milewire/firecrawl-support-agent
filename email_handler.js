@@ -42,19 +42,29 @@ export async function createEmailSubscription() {
   try {
     const graphClient = await getGraphClient();
     
+    // Get the user's email address first
+    const user = await graphClient.api('/users/' + process.env.MICROSOFT_USER_ID).get();
+    console.log('👤 User email:', user.mail || user.userPrincipalName);
+    
     const subscription = {
       changeType: 'created',
-      notificationUrl: `${process.env.BOT_WEBHOOK_URL || 'https://firecrawl-support-agent.onrender.com'}/email-webhook`,
-      resource: `/users/${process.env.MICROSOFT_USER_ID}/messages`,
+      notificationUrl: 'https://firecrawl-support-agent.onrender.com/email-webhook',
+      resource: '/users/' + process.env.MICROSOFT_USER_ID + '/messages',
       expirationDateTime: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days
-      clientState: 'firecrawl-support-agent'
+      clientState: 'firecrawl-support-agent',
+      includeResourceData: false
     };
 
+    console.log('📧 Creating subscription with:', JSON.stringify(subscription, null, 2));
+    
     const result = await graphClient.api('/subscriptions').post(subscription);
     console.log('✅ Email subscription created:', result.id);
     return result;
   } catch (error) {
     console.error('❌ Error creating email subscription:', error);
+    if (error.body) {
+      console.error('❌ Error details:', error.body);
+    }
     throw error;
   }
 }

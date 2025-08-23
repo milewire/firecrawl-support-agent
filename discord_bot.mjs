@@ -28,7 +28,7 @@ Key Firecrawl Information:
 - API Endpoints: /scrape, /sitemap, /search
 - Rate Limits: 1000 requests/hour
 - Common Issues: rate limits, invalid URLs, API errors, billing
-- Documentation: ${process.env.FIRECRAWL_DOCS_URL || 'https://docs.firecrawl.dev'}
+- Documentation: ${process.env.FIRECRAWL_DOCS_URL || 'image.pnghttps://docs.firecrawl.dev'}
 
 Be concise and accurate in your response.`;
 
