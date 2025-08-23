@@ -268,11 +268,15 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
 client.once(Events.ClientReady, (c) => {
   console.log(`✅ Logged in as ${c.user.tag}`);
+  
+  // Start autonomous email polling
+  startEmailPolling(2); // Poll every 2 minutes
 });
 
 // Simple web server for Render
 import express from 'express';
 import { setupEmailWebhook, processEmail, sendEmailReply, generateAutoReply } from './email_handler.js';
+import { startEmailPolling } from './email_poller.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
